@@ -250,11 +250,8 @@ exports.removeModel = function (model){
 
 exports.listModels = function (){
   try {
-    var fs = require('fs');
-    var path = require('path');
-
     var issuesModelPath = pth.join(__dirname, '..', 'issues-models');
-    const models = fs.readdirSync(issuesModelPath);
+    var models = fs.readdirSync(issuesModelPath);
     var result = [];
     for (var m in models)
       result.push(models[m].replace('.json', ''));
