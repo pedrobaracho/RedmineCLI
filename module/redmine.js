@@ -145,7 +145,7 @@ exports.getIssues = function(filters){
   } catch(err) {throw 'Could not load issues.'}
 }
 
-exports.getIssue = function(id, options){
+exports.getIssue = function(id, options, parent_override){
   throwWhenNotConnected();
 
   var include = '';
@@ -156,6 +156,9 @@ exports.getIssue = function(id, options){
     var issue = JSON.parse(response.getBody('utf8'));
     if(issue.issue.journals)
       resolver.resolveHistoryIdsToNames(issue.issue);
+
+    if(!parent_override && issue.issue.parent && issue.issue.parent.id)
+      issue.issue.parent = exports.getIssue(issue.issue.parent.id, {}, true).issue;
 
     return issue;
   } catch(err) {throw 'Could not load issue.'}
@@ -170,6 +173,7 @@ exports.updateIssue = function(id, options){
     if(options.priority)
       issue.issue.priority_id = exports.getPriorityIdByName(options.priority);
     if(options.assignee) issue.issue.assigned_to_id = options.assignee;
+    if(options.parent && typeof options.parent == 'string') issue.issue.parent_issue_id = options.parent;
     if(options.status)
       issue.issue.status_id = exports.getStatusIdByName(options.status);
     if(options.tracker)
